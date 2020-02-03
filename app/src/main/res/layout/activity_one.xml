@@ -1,17 +1,76 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.a30.ActivityOne">
+    android:orientation="vertical"
+    android:background="@drawable/bg"
+    tools:context="com.example.a30.First_page">
 
-    <TextView
-        android:id="@+id/txtInfo"
-        android:layout_width="wrap_content"
-        android:text="Activity One"
+    <ImageView
+        android:id="@+id/ivCamera"
+        android:layout_marginTop="20dp"
+        android:layout_gravity="top"
+        android:layout_marginBottom="20dp"
+        android:layout_marginLeft="20dp"
+        android:layout_width="365dp"
+        android:layout_height="200dp"/>
+
+    <Button
+        android:id="@+id/btnCamera"
+        android:layout_width="365dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginRight="20dp"
+        android:text="Open Camera"
         android:textSize="24sp"
-        android:layout_centerInParent="true"
-        android:layout_height="wrap_content" />
+        android:textColor="@android:color/white"
+        android:background="@android:color/holo_red_dark"/>
 
-</RelativeLayout>
+    <EditText
+        android:id="@+id/idname"
+        android:layout_width="365dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top"
+        android:layout_marginTop="50dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:hint="Enter Name"/>
+
+    <EditText
+        android:id="@+id/idphone"
+        android:layout_width="365dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="20dp"
+        android:layout_gravity="top"
+        android:hint="Enter Phone No"/>
+
+    <EditText
+        android:id="@+id/idrp"
+        android:layout_width="365dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="20dp"
+        android:layout_gravity="top"
+        android:hint="Reporting Person"/>
+
+    <Button
+        android:id="@+id/idsubmit"
+        android:layout_width="365dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top"
+        android:layout_marginTop="80dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:text="Submit"
+        android:textSize="24sp"
+        android:textColor="@android:color/white"
+        android:background="@android:color/holo_blue_dark"/>
+
+
+</LinearLayout>
