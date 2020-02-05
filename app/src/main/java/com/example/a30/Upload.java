@@ -2,61 +2,35 @@ package com.example.a30;
 
 class Upload {
 
-    private String mName;
-    private String mPhone;
-    private String mReportingPerson;
-    private String mUrl;
+    private String Name;
+    private String Phone;
+    private String ReportingPerson;
 
-    public Upload()
-    {
+    private String imageURL;
+
+    public Upload() {
 
     }
 
-    public Upload(String Name,String Phone,String ReportingPerson)
-    {
-        this.mName = Name;
-        this.mPhone = Phone;
-        this.mReportingPerson = ReportingPerson;
+    public Upload(String name,String phone,String reportingPerson, String url) {
+
+        this.Name = name;
+        this.Phone = phone;
+        this.ReportingPerson=reportingPerson;
+        this.imageURL= url;
     }
 
-    public String getmName()
-    {
-        return mName;
+    public String getImageName() {
+        return Name;
+    }
+    public String getPhone() {
+        return Phone;
+    }
+    public String getReportingPerson() {
+        return ReportingPerson;
     }
 
-    public void setmName (String Name)
-    {
-        mName = Name ;
+    public String getImageURL() {
+        return imageURL;
     }
-
-    public String getmPhone()
-    {
-        return mPhone;
-    }
-
-    public void setmPhone (String Phone)
-    {
-        mPhone = Phone ;
-    }
-
-    public String getmReportingPerson()
-    {
-        return mReportingPerson;
-    }
-
-    public void setmReportingPerson (String ReportingPerson)
-    {
-        mReportingPerson = ReportingPerson ;
-    }
-
-    public String getmUri()
-    {
-        return mUrl;
-    }
-
-    public void setmUri (String Url)
-    {
-        mUrl = Url ;
-    }
-
 }

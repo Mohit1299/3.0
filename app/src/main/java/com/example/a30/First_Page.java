@@ -1,5 +1,6 @@
 package com.example.a30;
 
+import android.app.ProgressDialog;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -26,122 +27,228 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.StorageTask;
 import com.google.firebase.storage.UploadTask;
 
+import java.io.IOException;
+
 
 public class First_Page extends AppCompatActivity {
 
+    String Storage_Path = "Images/";
+    // Root Database Name for Firebase Database.
+    String Database_Path = "Info/";
 
+    // Creating button.
+    Button ChooseButton, UploadButton;
 
-    private static final int PICK_IMAGE_REQUEST = 1;
+    // Creating EditText.
+    EditText Name ;
+    EditText Phone ;
+    EditText ReportingPerson;
 
-    private ImageView imageView;
-    private Button mSubmit;
-    private EditText mName;
-    private EditText mPhone;
-    private EditText mReportingPerson;
+    // Creating ImageView.
+    ImageView SelectImage;
 
-    private Uri mUri;
+    // Creating URI.
+    Uri FilePathUri;
 
-    private StorageReference mStorageRef;
-    private DatabaseReference mDatabaseRef;
-    private StorageTask mUploadTask;
+    // Creating StorageReference and DatabaseReference object.
+    StorageReference storageReference;
+    DatabaseReference databaseReference;
 
+    // Image request code for onActivityResult() .
+    int Image_Request_Code = 7;
 
-
+    ProgressDialog progressDialog ;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_one);
 
-        mSubmit = findViewById(R.id.idsubmit);
-        mName = findViewById(R.id.idname);
-        mPhone = findViewById(R.id.idphone);
-        mReportingPerson = findViewById(R.id.idrp);
-        Button btnCamera = findViewById(R.id.btnCamera);
-        imageView = findViewById(R.id.ivCamera);
+        // Assign FirebaseStorage instance to storageReference.
+        storageReference = FirebaseStorage.getInstance().getReference();
 
+        // Assign FirebaseDatabase instance with root database name.
+        databaseReference = FirebaseDatabase.getInstance().getReference().child("/Info");
 
-        mStorageRef = FirebaseStorage.getInstance().getReference("Photos");
-        mDatabaseRef = FirebaseDatabase.getInstance().getReference("Photos");
+        //Assign ID'S to button.
+        ChooseButton = (Button)findViewById(R.id.btnCamera);
+        UploadButton = (Button)findViewById(R.id.idsubmit);
 
-        btnCamera.setOnClickListener(new View.OnClickListener() {
+        // Assign ID's to EditText.
+        Name = (EditText)findViewById(R.id.idname);
+        Phone = (EditText)findViewById(R.id.idphone);
+        ReportingPerson= (EditText)findViewById(R.id.idrp);
+
+        // Assign ID'S to image view.
+        SelectImage = (ImageView)findViewById(R.id.ivCamera);
+
+        // Assigning Id to ProgressDialog.
+        progressDialog = new ProgressDialog(First_Page.this);
+
+        // Adding click listener to Choose image button.
+        ChooseButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                startActivityForResult(intent,0);
+            public void onClick(View view) {
+
+                // Creating intent.
+                Intent intent = new Intent();
+
+                // Setting intent type as image to select image from phone storage.
+                intent.setType("image/*");
+                intent.setAction(Intent.ACTION_GET_CONTENT);
+                startActivityForResult(Intent.createChooser(intent, "Please Select Image"), Image_Request_Code);
+
+                //Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                //if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+                 //   startActivityForResult(takePictureIntent, Image_Request_Code);
+                //}
+
             }
         });
 
-        mSubmit.setOnClickListener(new View.OnClickListener() {
+
+        // Adding click listener to Upload image button.
+        UploadButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
-                uploadFile();
+            public void onClick(View view) {
+
+                // Calling method to upload selected image on Firebase storage.
+                UploadImageFileToFirebaseStorage();
+
+
             }
         });
-
     }
 
     @Override
-    protected void onActivityResult(int requestCode,int resultCode,Intent data)
-    {
-        super.onActivityResult(requestCode,resultCode,data);
-        mUri =data.getData();
-        Bitmap bitmap = (Bitmap)data.getExtras().get("data");
-        imageView.setImageBitmap(bitmap);
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == Image_Request_Code && resultCode == RESULT_OK && data != null && data.getData() != null) {
+
+            FilePathUri = data.getData();
+
+            try {
+
+                // Getting selected image into Bitmap.
+                Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), FilePathUri);
+
+                // Setting up bitmap selected image into ImageView.
+                SelectImage.setImageBitmap(bitmap);
+
+                // After selecting image change choose button above text.
+                ChooseButton.setText("Image Selected");
+
+
+                    //Bundle extras = data.getExtras();
+                    //Bitmap imageBitmap = (Bitmap) extras.get("data");
+                    //SelectImage.setImageBitmap(imageBitmap);
+
+
+            }
+            catch (IOException e) {
+
+                e.printStackTrace();
+            }
+        }
     }
 
-    private String getFileExtension(Uri mUri)
-    {
-        ContentResolver cR = getContentResolver();
-        MimeTypeMap mime = MimeTypeMap.getSingleton();
-        return mime.getExtensionFromMimeType(cR.getType(mUri));
-    }
+    // Creating Method to get the selected image file Extension from File Path URI.
+    public String GetFileExtension(Uri uri) {
 
-    public void uploadFile()
-    {
-        StorageReference fileRefernce = mStorageRef.child(System.currentTimeMillis()
-                + "." +getFileExtension(mUri));
+        ContentResolver contentResolver = getContentResolver();
 
-        mUploadTask = fileRefernce.putFile(mUri)
-                .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                    @Override
-                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                        Handler handler = new Handler();
-                        handler.postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                
-                            }
-                        },2000);
+        MimeTypeMap mimeTypeMap = MimeTypeMap.getSingleton();
 
-                        Toast.makeText(First_Page.this,"Uploaded Successfully",Toast.LENGTH_LONG).show();
-                        Upload upload;
-                        upload = new Upload(mName.getText().toString().trim(),
-                                mPhone.getText().toString().trim(),
-                                mReportingPerson.getText().toString().trim());
-                        String uploadId = mDatabaseRef.push().getKey();
-                        mDatabaseRef.child(uploadId).setValue(upload);
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(First_Page.this,e.getMessage(),Toast.LENGTH_SHORT).show();
-                    }
-                })
-
-                .addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
-                    @Override
-                    public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
-
-                        double progress = (100.0  * taskSnapshot.getBytesTransferred() / taskSnapshot.getTotalByteCount());
-                        
-
-                    }
-                });
+        // Returning the file Extension.
+        return mimeTypeMap.getExtensionFromMimeType(contentResolver.getType(uri)) ;
 
     }
+
+    // Creating UploadImageFileToFirebaseStorage method to upload image on storage.
+    public void UploadImageFileToFirebaseStorage() {
+
+        // Checking whether FilePathUri Is empty or not.
+        if (FilePathUri != null) {
+
+            // Setting progressDialog Title.
+            progressDialog.setTitle("Image is Uploading...");
+
+            // Showing progressDialog.
+            progressDialog.show();
+
+            // Creating second StorageReference.
+            StorageReference storageReference2nd = storageReference.child(Storage_Path + System.currentTimeMillis() + "." + GetFileExtension(FilePathUri));
+
+            String name = Name.getText().toString().trim();
+            String phone = Phone.getText().toString().trim();
+            String reportingperson = ReportingPerson.getText().toString().trim();
+            //databaseReference.child(Database_Path + System.currentTimeMillis()).setValue(name);
+            //databaseReference.child(Database_Path + System.currentTimeMillis()).setValue(phone);
+            //databaseReference.child(Database_Path + System.currentTimeMillis()).setValue(reportingperson);
+
+            // Adding addOnSuccessListener to second StorageReference.
+            storageReference2nd.putFile(FilePathUri)
+                    .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+
+                            // Getting image name from EditText and store into string variable.
+                            String TempImageName = Name.getText().toString().trim();
+                            String TempPhone = Phone.getText().toString().trim();
+                            String TempReportingPerson = ReportingPerson.getText().toString().trim();
+
+                            // Hiding the progressDialog after done uploading.
+                            progressDialog.dismiss();
+
+                            // Showing toast message after done uploading.
+                            Toast.makeText(getApplicationContext(), "Image Uploaded Successfully ", Toast.LENGTH_LONG).show();
+
+                            @SuppressWarnings("VisibleForTests")
+                            Upload imageUploadInfo = new Upload(TempImageName,TempPhone,TempReportingPerson, taskSnapshot.getMetadata().getReference().getDownloadUrl().toString());
+
+                            // Getting image upload ID.
+                            String ImageUploadId = databaseReference.push().getKey();
+
+                            // Adding image upload id s child element into databaseReference.
+                            databaseReference.child(ImageUploadId).setValue(imageUploadInfo);
+                        }
+                    })
+                    // If something goes wrong .
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception exception) {
+
+                            // Hiding the progressDialog.
+                            progressDialog.dismiss();
+
+                            // Showing exception erro message.
+                            Toast.makeText(First_Page.this, exception.getMessage(), Toast.LENGTH_LONG).show();
+                        }
+                    })
+
+                    // On progress change upload time.
+                    .addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
+
+                            // Setting progressDialog Title.
+                            progressDialog.setTitle("Image is Uploading...");
+
+                        }
+                    });
+        }
+        else {
+
+            Toast.makeText(First_Page.this, "Please Select Image or Add Image Name", Toast.LENGTH_LONG).show();
+
+        }
     }
+
+}
+
+
 
 
 
