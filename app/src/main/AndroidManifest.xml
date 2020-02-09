@@ -2,6 +2,12 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.a30">
 
+    <supports-screens
+        android:largeScreens="true"
+        android:smallScreens="true"
+        android:xlargeScreens="true"
+        android:normalScreens="true"/>
+
     <uses-permission android:name="android.permission.INTERNET"></uses-permission>
 
     <application

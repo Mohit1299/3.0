@@ -1,20 +1,26 @@
 package com.example.a30;
 
+import android.app.NotificationManager;
 import android.app.ProgressDialog;
 import android.content.ContentResolver;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
+import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.webkit.MimeTypeMap;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
@@ -28,6 +34,7 @@ import com.google.firebase.storage.StorageTask;
 import com.google.firebase.storage.UploadTask;
 
 import java.io.IOException;
+import java.util.Date;
 
 
 public class First_Page extends AppCompatActivity {
@@ -43,6 +50,13 @@ public class First_Page extends AppCompatActivity {
     EditText Name ;
     EditText Phone ;
     EditText ReportingPerson;
+    EditText Purpose;
+    EditText Electronics;
+    RadioGroup radioGroup;
+    RadioButton yes;
+    RadioButton no;
+
+
 
     // Creating ImageView.
     ImageView SelectImage;
@@ -55,7 +69,7 @@ public class First_Page extends AppCompatActivity {
     DatabaseReference databaseReference;
 
     // Image request code for onActivityResult() .
-    int Image_Request_Code = 7;
+    int Image_Request_Code = 1;
 
     ProgressDialog progressDialog ;
 
@@ -78,12 +92,36 @@ public class First_Page extends AppCompatActivity {
         Name = (EditText)findViewById(R.id.idname);
         Phone = (EditText)findViewById(R.id.idphone);
         ReportingPerson= (EditText)findViewById(R.id.idrp);
+        Purpose = (EditText)findViewById(R.id.idpurpose);
+        Electronics = (EditText)findViewById(R.id.idelectronic);
+        Electronics.setVisibility(View.INVISIBLE);
 
         // Assign ID'S to image view.
         SelectImage = (ImageView)findViewById(R.id.ivCamera);
 
         // Assigning Id to ProgressDialog.
         progressDialog = new ProgressDialog(First_Page.this);
+
+        //Assigning ID's to RadioGroup and button
+        radioGroup = (RadioGroup)findViewById(R.id.rg);
+        yes = (RadioButton)findViewById(R.id.rbyes);
+        no = (RadioButton)findViewById(R.id.rbno);
+
+        radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+
+                if(yes.isChecked()== true)
+                {
+                    Electronics.setVisibility(View.VISIBLE);
+                }
+                if(no.isChecked()== true)
+                {
+                    Electronics.setVisibility(View.INVISIBLE);
+                }
+
+            }
+        });
 
         // Adding click listener to Choose image button.
         ChooseButton.setOnClickListener(new View.OnClickListener() {
@@ -98,10 +136,14 @@ public class First_Page extends AppCompatActivity {
                 intent.setAction(Intent.ACTION_GET_CONTENT);
                 startActivityForResult(Intent.createChooser(intent, "Please Select Image"), Image_Request_Code);
 
-                //Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                //Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                 //if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-                 //   startActivityForResult(takePictureIntent, Image_Request_Code);
+                  // startActivityForResult(intent, Image_Request_Code);
                 //}
+
+                //Intent intent = new Intent();
+                //intent.setAction(MediaStore.ACTION_IMAGE_CAPTURE);
+                //startActivityForResult(intent,Image_Request_Code);
 
             }
         });
@@ -114,6 +156,7 @@ public class First_Page extends AppCompatActivity {
 
                 // Calling method to upload selected image on Firebase storage.
                 UploadImageFileToFirebaseStorage();
+                notificationCall();
 
 
             }
@@ -125,9 +168,13 @@ public class First_Page extends AppCompatActivity {
 
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == Image_Request_Code && resultCode == RESULT_OK && data != null && data.getData() != null) {
+        if (requestCode == Image_Request_Code && resultCode == RESULT_OK ) {
+
+            //&& data != null && data.getData() != null
 
             FilePathUri = data.getData();
+
+
 
             try {
 
@@ -166,6 +213,9 @@ public class First_Page extends AppCompatActivity {
 
     }
 
+
+
+
     // Creating UploadImageFileToFirebaseStorage method to upload image on storage.
     public void UploadImageFileToFirebaseStorage() {
 
@@ -184,6 +234,8 @@ public class First_Page extends AppCompatActivity {
             String name = Name.getText().toString().trim();
             String phone = Phone.getText().toString().trim();
             String reportingperson = ReportingPerson.getText().toString().trim();
+            String purpose = Purpose.getText().toString().trim();
+            String electronics = Electronics.getText().toString().trim();
             //databaseReference.child(Database_Path + System.currentTimeMillis()).setValue(name);
             //databaseReference.child(Database_Path + System.currentTimeMillis()).setValue(phone);
             //databaseReference.child(Database_Path + System.currentTimeMillis()).setValue(reportingperson);
@@ -198,15 +250,19 @@ public class First_Page extends AppCompatActivity {
                             String TempImageName = Name.getText().toString().trim();
                             String TempPhone = Phone.getText().toString().trim();
                             String TempReportingPerson = ReportingPerson.getText().toString().trim();
-
+                            String TempPurpose = Purpose.getText().toString().trim();
+                            String TempElectronics = Electronics.getText().toString().trim();
+                            Date date=java.util.Calendar.getInstance().getTime();
+                            String DateandTime = date.toString();
                             // Hiding the progressDialog after done uploading.
                             progressDialog.dismiss();
 
                             // Showing toast message after done uploading.
                             Toast.makeText(getApplicationContext(), "Image Uploaded Successfully ", Toast.LENGTH_LONG).show();
 
+
                             @SuppressWarnings("VisibleForTests")
-                            Upload imageUploadInfo = new Upload(TempImageName,TempPhone,TempReportingPerson, taskSnapshot.getMetadata().getReference().getDownloadUrl().toString());
+                            Upload imageUploadInfo = new Upload(TempImageName,TempPhone,TempReportingPerson,TempPurpose,TempElectronics,DateandTime, taskSnapshot.getMetadata().getReference().getDownloadUrl().toString());
 
                             // Getting image upload ID.
                             String ImageUploadId = databaseReference.push().getKey();
@@ -245,6 +301,24 @@ public class First_Page extends AppCompatActivity {
 
         }
     }
+
+
+    public void notificationCall(){
+
+        String notificationstring =  ReportingPerson.getText().toString().trim();
+
+        NotificationCompat.Builder notificationBuilder = (NotificationCompat.Builder) new NotificationCompat.Builder(this)
+                .setDefaults(NotificationCompat.DEFAULT_ALL)
+                .setSmallIcon(R.drawable.friends)
+                .setLargeIcon(BitmapFactory.decodeResource(getResources(),R.drawable.friends))
+                .setContentTitle("Notification")
+                .setContentText("New Visitor For " + notificationstring);
+
+        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.notify(1,notificationBuilder.build());
+
+    }
+
 
 }
 
