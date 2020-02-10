@@ -39,6 +39,7 @@
         android:background="@android:color/holo_red_dark"/>
 
     <EditText
+
         android:id="@+id/idname"
         android:layout_width="365dp"
         android:layout_height="wrap_content"
@@ -62,7 +63,7 @@
         android:id="@+id/idrp"
         android:layout_width="365dp"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="12dp"
+        android:layout_marginLeft="23dp"
         android:layout_marginRight="20dp"
         android:layout_marginTop="20dp"
         android:layout_gravity="top"
@@ -72,7 +73,7 @@
             android:id="@+id/idpurpose"
             android:layout_width="365dp"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="12dp"
+            android:layout_marginLeft="23dp"
             android:layout_marginRight="20dp"
             android:layout_marginTop="20dp"
             android:layout_gravity="top"
@@ -87,7 +88,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="top"
-                android:layout_marginLeft="12dp"
+                android:layout_marginLeft="23dp"
                 android:layout_marginTop="20dp"
                 android:layout_marginRight="20dp"
                 android:text="Do you have any Electronics/Storage Device
@@ -98,7 +99,7 @@
                 android:id="@+id/rbyes"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="12dp"
+                android:layout_marginLeft="23dp"
                 android:layout_marginRight="20dp"
                 android:layout_marginTop="20dp"
                 android:layout_gravity="top"
@@ -119,7 +120,7 @@
             android:id="@+id/idelectronic"
             android:layout_width="365dp"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="12dp"
+            android:layout_marginLeft="23dp"
             android:layout_marginRight="20dp"
             android:layout_marginTop="20dp"
             android:layout_gravity="top"
@@ -134,7 +135,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="top"
         android:layout_marginTop="80dp"
-        android:layout_marginLeft="12dp"
+        android:layout_marginLeft="23dp"
         android:layout_marginRight="20dp"
         android:text="Submit"
         android:textSize="24sp"

@@ -4,6 +4,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+import java.util.PriorityQueue;
 
 class Upload {
 
@@ -13,6 +14,7 @@ class Upload {
     private String Purpose;
     private String Electronics;
     private String CurrentDateandTime;
+    private String ImageID;
 
     private String imageURL;
 
@@ -24,7 +26,7 @@ class Upload {
     Date date=java.util.Calendar.getInstance().getTime();
     String currentdateandtime = date.toString();
 
-    public Upload(String name,String phone,String reportingPerson,String purpose,String electronics,String currentdateandtime, String url) {
+    public Upload(String name,String phone,String reportingPerson,String purpose,String electronics,String currentdateandtime,String imageID, String url) {
 
         this.Name = name;
         this.Phone = phone;
@@ -33,6 +35,7 @@ class Upload {
         this.Electronics = electronics;
         this.imageURL= url;
         this.CurrentDateandTime = currentdateandtime;
+        this.ImageID = imageID;
     }
 
     public String getImageName() {
@@ -47,6 +50,7 @@ class Upload {
     public String getPurpose(){return Purpose;}
     public String getElectronics(){return Electronics;}
     public String getCurrentdateandtime(){return CurrentDateandTime;}
+    public String getImageID(){return ImageID;}
 
     public String getImageURL() {
         return imageURL;

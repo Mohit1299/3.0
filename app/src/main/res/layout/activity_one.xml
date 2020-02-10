@@ -46,7 +46,7 @@
         android:layout_marginTop="50dp"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
-        android:hint="Enter Name"/>
+        android:hint="Enter Name" />
 
     <EditText
         android:id="@+id/idphone"

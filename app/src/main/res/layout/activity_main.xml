@@ -10,7 +10,7 @@
 
     <LinearLayout
         android:orientation="vertical"
-        android:background="@drawable/bg"
+        android:background="@drawable/background"
         android:weightSum="10"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -20,14 +20,21 @@
         android:layout_width="match_parent"
         android:layout_height="0dp">
 
-        <TextView
+       <!-- <TextView
             android:id="@+id/textGrid"
             android:text="AFour Tech"
             android:textSize="34sp"
             android:textColor="@android:color/white"
             android:layout_centerInParent="true"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content" />  -->
+
+        <ImageView
+            android:layout_centerVertical="true"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/logo"
+            android:src="@drawable/logo"></ImageView>
 
     </RelativeLayout>
 
@@ -47,6 +54,7 @@
 
         <!-- Column 1 -->
         <android.support.v7.widget.CardView
+            android:background="@android:color/black"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_columnWeight="1"
@@ -208,7 +216,7 @@
         <!-- Row 2 -->
 
         <!-- Column 1 -->
-        <android.support.v7.widget.CardView
+        <!-- <android.support.v7.widget.CardView
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_columnWeight="1"
@@ -244,7 +252,7 @@
 
             </LinearLayout>
 
-        </android.support.v7.widget.CardView>
+        </android.support.v7.widget.CardView>  -->
 
         <!-- Column 2 -->
         <android.support.v7.widget.CardView

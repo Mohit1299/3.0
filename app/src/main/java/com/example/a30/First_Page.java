@@ -1,10 +1,13 @@
 package com.example.a30;
 
+import android.Manifest;
 import android.app.NotificationManager;
 import android.app.ProgressDialog;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -12,6 +15,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -33,6 +37,8 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.StorageTask;
 import com.google.firebase.storage.UploadTask;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.util.Date;
 
@@ -63,6 +69,7 @@ public class First_Page extends AppCompatActivity {
 
     // Creating URI.
     Uri FilePathUri;
+    File file;
 
     // Creating StorageReference and DatabaseReference object.
     StorageReference storageReference;
@@ -123,31 +130,38 @@ public class First_Page extends AppCompatActivity {
             }
         });
 
+
+
+
         // Adding click listener to Choose image button.
         ChooseButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
                 // Creating intent.
-                Intent intent = new Intent();
+                //Intent intent = new Intent();
 
                 // Setting intent type as image to select image from phone storage.
-                intent.setType("image/*");
-                intent.setAction(Intent.ACTION_GET_CONTENT);
-                startActivityForResult(Intent.createChooser(intent, "Please Select Image"), Image_Request_Code);
+                //intent.setType("image/*");
+                //intent.setAction(Intent.ACTION_GET_CONTENT);
+                //startActivityForResult(Intent.createChooser(intent, "Please Select Image"), Image_Request_Code);
 
-                //Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                 //if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-                  // startActivityForResult(intent, Image_Request_Code);
+                  startActivityForResult(intent, Image_Request_Code);
                 //}
 
                 //Intent intent = new Intent();
                 //intent.setAction(MediaStore.ACTION_IMAGE_CAPTURE);
                 //startActivityForResult(intent,Image_Request_Code);
 
+
             }
         });
 
+
+        ActivityCompat.requestPermissions(First_Page.this,
+                new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},1);
 
         // Adding click listener to Upload image button.
         UploadButton.setOnClickListener(new View.OnClickListener() {
@@ -163,6 +177,11 @@ public class First_Page extends AppCompatActivity {
         });
     }
 
+    public void myMethod()
+    {
+        Toast.makeText(First_Page.this,"Permission Granted",Toast.LENGTH_LONG).show();
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
@@ -170,9 +189,17 @@ public class First_Page extends AppCompatActivity {
 
         if (requestCode == Image_Request_Code && resultCode == RESULT_OK ) {
 
+
+            Bitmap photo = (Bitmap) data.getExtras().get("data");
+            SelectImage.setImageBitmap(photo);
+
+            FilePathUri = getImageUri(getApplicationContext(),photo);
+
+            file = new File(getRealPathFromUri(FilePathUri));
+
             //&& data != null && data.getData() != null
 
-            FilePathUri = data.getData();
+           /* FilePathUri = data.getData();
 
 
 
@@ -197,9 +224,61 @@ public class First_Page extends AppCompatActivity {
             catch (IOException e) {
 
                 e.printStackTrace();
-            }
+            }*/
+
         }
     }
+
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case 1: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // permission granted and now can proceed
+                     myMethod();//a sample method called
+
+                } else {
+
+                    // permission denied, boo! Disable the
+                    // functionality that depends on this permission.
+                    Toast.makeText(First_Page.this, "Permission denied to read your External storage", Toast.LENGTH_SHORT).show();
+                }
+                return;
+            }
+            // add other cases for more permissions
+        }
+    }
+
+
+    public Uri getImageUri(Context inContext,Bitmap inImage)
+    {
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        inImage.compress(Bitmap.CompressFormat.JPEG,100,bytes);
+        String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(),inImage,"Title",null);
+        return Uri.parse(path);
+    }
+
+    public String getRealPathFromUri(Uri uri)
+    {
+        String path = "";
+        if(getContentResolver()!=null)
+        {
+            Cursor cursor = getContentResolver().query(uri,null,null,null,null);
+            if(cursor!=null)
+            {
+                cursor.moveToFirst();
+                int idx = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
+                path = cursor.getString(idx);
+                cursor.close();
+            }
+        }
+        return path;
+    }
+
+
 
     // Creating Method to get the selected image file Extension from File Path URI.
     public String GetFileExtension(Uri uri) {
@@ -229,7 +308,8 @@ public class First_Page extends AppCompatActivity {
             progressDialog.show();
 
             // Creating second StorageReference.
-            StorageReference storageReference2nd = storageReference.child(Storage_Path + System.currentTimeMillis() + "." + GetFileExtension(FilePathUri));
+            final String child = Storage_Path + System.currentTimeMillis() + "." + GetFileExtension(FilePathUri);
+            StorageReference storageReference2nd = storageReference.child(child);
 
             String name = Name.getText().toString().trim();
             String phone = Phone.getText().toString().trim();
@@ -254,6 +334,7 @@ public class First_Page extends AppCompatActivity {
                             String TempElectronics = Electronics.getText().toString().trim();
                             Date date=java.util.Calendar.getInstance().getTime();
                             String DateandTime = date.toString();
+                            String ImageID = child ;
                             // Hiding the progressDialog after done uploading.
                             progressDialog.dismiss();
 
@@ -262,13 +343,20 @@ public class First_Page extends AppCompatActivity {
 
 
                             @SuppressWarnings("VisibleForTests")
-                            Upload imageUploadInfo = new Upload(TempImageName,TempPhone,TempReportingPerson,TempPurpose,TempElectronics,DateandTime, taskSnapshot.getMetadata().getReference().getDownloadUrl().toString());
+                            Upload imageUploadInfo = new Upload(TempImageName,TempPhone,TempReportingPerson,TempPurpose,TempElectronics,DateandTime,ImageID, taskSnapshot.getMetadata().getReference().getDownloadUrl().toString());
 
                             // Getting image upload ID.
                             String ImageUploadId = databaseReference.push().getKey();
 
                             // Adding image upload id s child element into databaseReference.
                             databaseReference.child(ImageUploadId).setValue(imageUploadInfo);
+
+                            Name.getText().clear();
+                            Phone.getText().clear();
+                            ReportingPerson.getText().clear();
+                            Purpose.getText().clear();
+                            Electronics.getText().clear();
+                            SelectImage.setImageBitmap(null);
                         }
                     })
                     // If something goes wrong .
