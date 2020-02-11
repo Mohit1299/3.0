@@ -161,7 +161,8 @@ public class First_Page extends AppCompatActivity {
 
 
         ActivityCompat.requestPermissions(First_Page.this,
-                new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},1);
+                new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE},1);
+
 
         // Adding click listener to Upload image button.
         UploadButton.setOnClickListener(new View.OnClickListener() {
@@ -236,7 +237,7 @@ public class First_Page extends AppCompatActivity {
             case 1: {
                 // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
                     // permission granted and now can proceed
                      myMethod();//a sample method called
 
